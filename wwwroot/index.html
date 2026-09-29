@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>消息结构兼容性实验室</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">🧪 消息结构兼容性实验室</div>
+    <div class="sub">旧 writer × 新 reader 及反向组合的真实编码 / 解码 / 往返行为验证</div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h2>Schema 家族</h2>
+      <div class="row">
+        <input id="newFamilyName" placeholder="新建家族名称" />
+        <button id="createFamilyBtn">新建</button>
+      </div>
+      <ul id="familyList" class="family-list"></ul>
+      <div class="hint">发布后 schema 不可修改；任何调整都形成新版本。</div>
+    </aside>
+
+    <section class="content">
+      <div class="tabs">
+        <button class="tab active" data-tab="schema">Schema / 版本</button>
+        <button class="tab" data-tab="samples">样例</button>
+        <button class="tab" data-tab="runs">矩阵运行</button>
+        <button class="tab" data-tab="export">导出</button>
+      </div>
+
+      <!-- Schema tab -->
+      <div class="panel" id="tab-schema">
+        <div class="panel-head">
+          <h3>Draft（工作草稿）<span class="rev-badge" id="draftRev"></span></h3>
+          <div class="row">
+            <input id="publishVersion" placeholder="版本号，如 v4" />
+            <button id="publishBtn">发布为新版本</button>
+          </div>
+        </div>
+        <textarea id="draftEditor" class="editor" spellcheck="false" placeholder="在此编辑 record / enum / union / required / default / alias 定义（JSON）"></textarea>
+        <div class="row">
+          <button id="saveDraftBtn">保存 draft</button>
+          <span id="draftMsg" class="msg"></span>
+        </div>
+
+        <h3>已发布版本（不可变）</h3>
+        <div id="versionList" class="version-list"></div>
+      </div>
+
+      <!-- Samples tab -->
+      <div class="panel hidden" id="tab-samples">
+        <h3>上传各版本样例</h3>
+        <div class="row">
+          <select id="sampleVersion"></select>
+        </div>
+        <textarea id="sampleEditor" class="editor" spellcheck="false" placeholder="该版本的一条样例 JSON（secret 字段写入明文，入库前自动替换为不可逆 token）"></textarea>
+        <div class="row">
+          <button id="uploadSampleBtn">上传 / 替换样例</button>
+          <span id="sampleMsg" class="msg"></span>
+        </div>
+        <div id="sampleList" class="sample-list"></div>
+      </div>
+
+      <!-- Runs tab -->
+      <div class="panel hidden" id="tab-runs">
+        <h3>生成兼容矩阵</h3>
+        <div class="row">
+          <input id="idempotencyKey" placeholder="幂等键（相同键+相同内容返回原运行）" />
+          <label class="chk"><input type="checkbox" id="policyPreserve" checked /> 保留未知字段</label>
+          <button id="createRunBtn">生成 / 复用运行</button>
+          <button id="refreshRunBtn">刷新</button>
+        </div>
+        <div id="runMsg" class="msg"></div>
+        <div class="legend">
+          <span class="badge ok">兼容</span>
+          <span class="badge err">硬错误</span>
+          <span class="badge rev">可逆</span>
+          <span class="badge lost">不可逆</span>
+          <span class="muted">点击格子下钻字节与字段来源。</span>
+        </div>
+        <div id="runList"></div>
+      </div>
+
+      <!-- Export tab -->
+      <div class="panel hidden" id="tab-export">
+        <h3>导出（schema + 摘要 + 矩阵结论）</h3>
+        <div class="row">
+          <button id="exportBtn">导出当前家族 JSON</button>
+          <span class="muted">secret 字段只保留存在性与 SHA-256 摘要。</span>
+        </div>
+        <textarea id="exportView" class="editor" spellcheck="false"></textarea>
+      </div>
+    </section>
+  </main>
+
+  <!-- Drilldown modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 id="modalTitle">格子详情</h3>
+        <button id="modalClose">×</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

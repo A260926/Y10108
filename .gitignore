@@ -34,3 +34,9 @@ coverage/
 .vite/
 .turbo/
 *.tsbuildinfo
+
+# App runtime database
+compatibility-lab.db
+compatibility-lab.db-*
+bin/
+obj/
